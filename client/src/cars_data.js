@@ -1,5 +1,4 @@
-
-export const auta = [
+export default [
   {
     id: 1,
     spz: 'BA458CD',
@@ -12,6 +11,9 @@ export const auta = [
     spotreba: 7,
     znamka: true,
     pozicane: false,
+    cena: 59,
+    popis:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ipsum nunc, dictum vel dapibus at, luctus sit amet diam. Nam.',
   },
   {
     id: 2,
@@ -25,6 +27,9 @@ export const auta = [
     spotreba: 9,
     znamka: true,
     pozicane: false,
+    cena: 60,
+    popis:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ipsum nunc, dictum vel dapibus at, luctus sit amet diam. Nam.',
   },
   {
     id: 3,
@@ -38,6 +43,9 @@ export const auta = [
     spotreba: 6,
     znamka: false,
     pozicane: false,
+    cena: 48,
+    popis:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ipsum nunc, dictum vel dapibus at, luctus sit amet diam. Nam.',
   },
   {
     id: 4,
@@ -51,6 +59,9 @@ export const auta = [
     spotreba: 6,
     znamka: false,
     pozicane: false,
+    cena: 64,
+    popis:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ipsum nunc, dictum vel dapibus at, luctus sit amet diam. Nam.',
   },
   {
     id: 5,
@@ -64,6 +75,9 @@ export const auta = [
     spotreba: 10,
     znamka: true,
     pozicane: true,
+    cena: 80,
+    popis:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ipsum nunc, dictum vel dapibus at, luctus sit amet diam. Nam.',
   },
   {
     id: 6,
@@ -77,6 +91,9 @@ export const auta = [
     spotreba: 6,
     znamka: true,
     pozicane: true,
+    cena: 30,
+    popis:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ipsum nunc, dictum vel dapibus at, luctus sit amet diam. Nam.',
   },
   {
     id: 7,
@@ -90,6 +107,9 @@ export const auta = [
     spotreba: 5,
     znamka: true,
     pozicane: false,
+    cena: 35,
+    popis:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ipsum nunc, dictum vel dapibus at, luctus sit amet diam. Nam.',
   },
   {
     id: 8,
@@ -103,6 +123,9 @@ export const auta = [
     spotreba: 11,
     znamka: false,
     pozicane: false,
+    cena: 45,
+    popis:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ipsum nunc, dictum vel dapibus at, luctus sit amet diam. Nam.',
   },
   {
     id: 9,
@@ -116,6 +139,9 @@ export const auta = [
     spotreba: 9,
     znamka: true,
     pozicane: false,
+    cena: 35,
+    popis:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ipsum nunc, dictum vel dapibus at, luctus sit amet diam. Nam.',
   },
   {
     id: 10,
@@ -129,5 +155,8 @@ export const auta = [
     spotreba: 12,
     znamka: true,
     pozicane: false,
+    cena: 67,
+    popis:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ipsum nunc, dictum vel dapibus at, luctus sit amet diam. Nam.',
   },
 ];

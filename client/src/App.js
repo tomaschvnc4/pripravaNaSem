@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { useGlobalContext } from './context';
 
 //pages
 import Home from './pages/Home';
@@ -9,37 +10,51 @@ import A_vypozicky from './pages/A_vypozicky';
 import About from './pages/About';
 import Error from './pages/Error';
 import Profil from './pages/Profil';
+import Login from './pages/Login';
+import RegisterPage from './pages/Register';
 
 //component
 import Navbar from './components/Navbar';
+
 //css
 import './App.css';
 
 function App() {
+  // const { isShowNav, showNav, hideNav } = useGlobalContext();
   return (
-    <div>
-      hello world
-      <Router>
-        <Navbar />
-        <Switch>
-          <Route exact path='/'>
-            <Home />
-          </Route>
-          <Route path='/vypozicky'>
-            <Vypozicky />
-          </Route>
-          <Route path='/about'>
-            <About />
-          </Route>
-          <Route path='/profil'>
-            <Profil />
-          </Route>
-          <Route path='/*'>
-            <Error />
-          </Route>
-        </Switch>
-      </Router>
-    </div>
+    <Router>
+      <Switch>
+        <Route exact path='/'>
+          <Navbar />
+          <Home />
+        </Route>
+        <Route path='/vypozicky'>
+          <Navbar />
+          <Vypozicky />
+        </Route>
+        <Route path='/about'>
+          <Navbar />
+          <About />
+        </Route>
+        <Route path='/profil'>
+          <Navbar />
+          <Profil />
+        </Route>
+        <Route path='/admin'>
+          <Navbar />
+          <A_vypozicky />
+        </Route>
+        <Route path='/login'>
+          <Login />
+        </Route>
+        <Route path='/register'>
+          <RegisterPage />
+        </Route>
+        <Route path='/*'>
+          <Error />
+        </Route>
+      </Switch>
+    </Router>
   );
 }
 

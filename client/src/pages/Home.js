@@ -1,7 +1,17 @@
+import { Grid } from '@material-ui/core';
 import React from 'react';
+import CarsContainer from '../components/CarsContainer';
+import { useGlobalContext } from '../context';
 
 const Home = () => {
-  return <div>Home</div>;
+  // const { showNav } = useGlobalContext();
+
+  return (
+    <div>
+      Home
+      <CarsContainer />
+    </div>
+  );
 };
 
 export default Home;
