@@ -1,43 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Axios from 'axios';
 import { Link, Redirect } from 'react-router-dom';
 
 import { useForm } from 'react-hook-form';
 
 //MUI
-import {
-  Button,
-  IconButton,
-  Paper,
-  TextField,
-  Typography,
-} from '@material-ui/core';
+import { Button, IconButton, Paper, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import { useGlobalContext } from '../context';
-
-const useStyles = makeStyles((theme) => ({
-  //   _padding: {
-  // //     padding: '10px',
-  //   },
-  _root: {
-    padding: '20px',
-    textTransform: 'capitalize',
-    '& .MuiFormControl-root': {
-      margin: '5px 0 5px 0',
-    },
-    '& .MuiButton-root ': {
-      marginTop: '20px',
-    },
-    '& .MuiButton-label': {
-      textTransform: 'none',
-    },
-    '& h5': {
-      textTransform: 'none',
-    },
-  },
-}));
 
 const logint = {
   login: 'jano',
@@ -46,24 +19,55 @@ const logint = {
 
 const Login = () => {
   const classes = useStyles();
-  const { handleLogin, isLogin, isFaild, handleIsFailed } = useGlobalContext();
+  const {
+    handleLogin,
+    isLogin,
+    isFaild,
+    handleIsFailed,
+    resMsg,
+    handleResMsg,
+    handleUser,
+  } = useGlobalContext();
+
   const { register, handleSubmit, errors } = useForm();
+  //my states
   const [isShowPass, setisShowPass] = React.useState(false);
 
   const onSubmit = (data, e) => {
     e.target.reset();
-    const { login, heslo } = data;
-    if (login === logint.login && heslo === logint.heslo) {
-      console.log('logged');
-      handleIsFailed(false);
-      handleLogin(true);
-      //return <Redirect to={{ pathname: '/' }} />;
-    } else {
-      console.log('failed');
-      handleIsFailed(true);
-    }
+    console.log(data);
+    const { username, heslo } = data;
+    handleResMsg('');
+    // Axios.defaults.withCredentials = true;
+    Axios.post('http://localhost:3001/login', {
+      ...data,
+    }).then((response) => {
+      const { stat, msg, newUser } = response.data;
+      console.log(newUser);
+      if (stat === true) {
+        console.log('logged');
+        handleIsFailed(false);
+        handleLogin(true);
+        handleResMsg('');
+        handleUser({ ...newUser });
+      } else {
+        console.log('failed');
+        handleIsFailed(true);
+        handleResMsg(msg);
+      }
+    });
+    //   if (login === logint.login && heslo === logint.heslo) {
+    //     console.log('logged');
+    //     handleIsFailed(false);
+    //     handleLogin(true);
+    //     //return <Redirect to={{ pathname: '/' }} />;
+    //   } else {
+    //     console.log('failed');
+    //     handleIsFailed(true);
+    //   }
+    // };
+    // console.log(isFaild);
   };
-  console.log(isFaild);
   if (isLogin) {
     return <Redirect to={{ pathname: '/' }} />;
   }
@@ -74,7 +78,7 @@ const Login = () => {
         <Paper elevation={5} className={classes._root}>
           {isFaild && (
             <Typography variant='subtitle1' component='h6' color='secondary'>
-              Zle meno/heslo
+              {resMsg}
             </Typography>
           )}
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -95,11 +99,11 @@ const Login = () => {
               variant='outlined'
               label='login(*)'
               placeholder='login'
-              name='login'
+              name='username'
               type='text'
-              id='login'
-              error={errors.hasOwnProperty('login')} //ak ju errory v poli atribut fullname tak znamena ze je error a nastavi na true
-              helperText={errors.login?.message}
+              id='username'
+              error={errors.hasOwnProperty('username')} //ak ju errory v poli atribut fullname tak znamena ze je error a nastavi na true
+              helperText={errors.username?.message}
               // onChange={(e) => setFullName(e.target.value)}
               inputRef={register({
                 pattern: {
@@ -133,8 +137,7 @@ const Login = () => {
               Prihlásiť sa
             </Button>
             <Typography variant='subtitle2' component='h5' className='center'>
-              Ešte nemáte účet, <Link to='/register'> zaregistrujte </Link> sa
-              teraz.
+              Ešte nemáte účet, <Link to='/register'> zaregistrujte </Link> sa teraz.
             </Typography>
           </form>
         </Paper>
@@ -144,3 +147,25 @@ const Login = () => {
 };
 
 export default Login;
+
+const useStyles = makeStyles((theme) => ({
+  //   _padding: {
+  // //     padding: '10px',
+  //   },
+  _root: {
+    padding: '20px',
+    textTransform: 'capitalize',
+    '& .MuiFormControl-root': {
+      margin: '5px 0 5px 0',
+    },
+    '& .MuiButton-root ': {
+      marginTop: '20px',
+    },
+    '& .MuiButton-label': {
+      textTransform: 'none',
+    },
+    '& h5': {
+      textTransform: 'none',
+    },
+  },
+}));

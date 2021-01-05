@@ -1,59 +1,74 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
-import moment from 'moment';
+// import moment from 'moment';
+import Axios from 'axios';
 
 import { useForm } from 'react-hook-form';
 
 //MUI
-import {
-  Button,
-  IconButton,
-  Paper,
-  TextField,
-  Typography,
-} from '@material-ui/core';
+import { Button, IconButton, Paper, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 import { useGlobalContext } from '../context';
-
-const useStyles = makeStyles((theme) => ({
-  //   _padding: {
-  // //     padding: '10px',
-  //   },
-  _root: {
-    padding: '20px',
-    textTransform: 'capitalize',
-    '& .MuiFormControl-root': {
-      margin: '5px 0 5px 0',
-    },
-    '& .MuiButton-root ': {
-      marginTop: '20px',
-    },
-    '& .MuiButton-label': {
-      textTransform: 'none',
-    },
-    '& h5': {
-      textTransform: 'none',
-    },
+const registerFields = {
+  //kde kluc bude tiez pouzity ako id aj name
+  meno: {
+    type: 'text',
+    label: 'Meno(*)',
+    placeholder: 'Meno',
+    pattern: /^[a-zA-Z0-9_-]*$/,
+    patternMsg: 'Meno obsahuje nepovolené znaky.',
+    requiredMsg: 'Meno je potrebné vyplniť.',
   },
-}));
-
-const logint = {
-  login: 'jano',
-  heslo: 'jano1',
+  email: {
+    type: 'email',
+    label: 'Email(*)',
+    placeholder: 'Email',
+    pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+    patternMsg: 'Nepodporovaný email!',
+    requiredMsg: 'Emial je potrebné vyplniť.',
+  },
+  telefon: {
+    type: 'text',
+    label: 'Tel.číslo(*)',
+    placeholder: 'Tel.číslo',
+    pattern: /^(\+?\d{0,4})?\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{4}\)?)?$/,
+    patternMsg: 'Nesprávny formát telefónneho čisla!',
+    requiredMsg: 'Tel.číslo je potrebné vyplniť.',
+  },
+  username: {
+    type: 'text',
+    label: 'Login(*)',
+    placeholder: 'Login',
+    pattern: /^[a-zA-Z0-9_-]*$/,
+    patternMsg: 'Login obsahuje nepovolené znaky!',
+    requiredMsg: 'Login je potrebné vyplniť.',
+  },
 };
+const fieldKeysRegister = Object.keys(registerFields);
+console.log(fieldKeysRegister);
 
-const Login = () => {
+const Register = () => {
   const classes = useStyles();
-  const { handleLogin, isLogin, isFaild, handleIsFailed } = useGlobalContext();
+  const { isFaild, handleIsFailed, resMsg, handleResMsg } = useGlobalContext();
   const { register, handleSubmit, errors } = useForm();
-  const [isShowPass, setisShowPass] = React.useState(false);
+  //myState
+  const [isShowPass, setisShowPass] = useState(false);
 
   const onSubmit = (data, e) => {
-    e.target.reset();
+    // e.target.reset();
+    handleResMsg('');
+    const tmp = { ...data };
+    console.log(tmp);
+
+    Axios.post('http://localhost:3001/register', {
+      ...data,
+    }).then((response) => {
+      handleResMsg(response.data.msg);
+    });
   };
 
   const time = () => {
@@ -92,68 +107,32 @@ const Login = () => {
               </Link>
             </div>
 
-            <TextField
-              fullWidth
-              multiline
-              variant='outlined'
-              label='Meno(*)'
-              placeholder='Meno'
-              name='meno'
-              type='text'
-              id='meno'
-              error={errors.hasOwnProperty('meno')} //ak ju errory v poli atribut fullname tak znamena ze je error a nastavi na true
-              helperText={errors.meno?.message}
-              // onChange={(e) => setFullName(e.target.value)}
-              inputRef={register({
-                pattern: {
-                  value: /^[a-zA-Z0-9_-]*$/,
-                  // value: /^(\+?\d{0,4})?\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{4}\)?)?$/,
-                  message: 'Meno obsahuje nepovolené znaky ',
-                },
-                required: 'Meno je potrebne vyplnit ',
-              })}
-            />
-            <TextField
-              fullWidth
-              multiline
-              variant='outlined'
-              label='Email(*)'
-              placeholder='Email'
-              name='email'
-              type='email'
-              id='email'
-              error={errors.hasOwnProperty('email')} //ak ju errory v poli atribut fullname tak znamena ze je error a nastavi na true
-              helperText={errors.email?.message}
-              // onChange={(e) => setFullName(e.target.value)}
-              inputRef={register({
-                pattern: {
-                  value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-                  // value: /^(\+?\d{0,4})?\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{4}\)?)?$/,
-                  message: 'Nesprávny email! ',
-                },
-                required: 'Emial je potrebne vyplnit ',
-              })}
-            />
-            <TextField
-              fullWidth
-              multiline
-              variant='outlined'
-              label='Tel.číslo(*)'
-              placeholder='Tel.číslo'
-              name='cislo'
-              type='text'
-              id='cislo'
-              error={errors.hasOwnProperty('cislo')} //ak ju errory v poli atribut fullname tak znamena ze je error a nastavi na true
-              helperText={errors.cislo?.message}
-              // onChange={(e) => setFullName(e.target.value)}
-              inputRef={register({
-                pattern: {
-                  value: /^(\+?\d{0,4})?\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{4}\)?)?$/,
-                  message: 'Nesprávny formát telefónneho čisla!',
-                },
-                required: 'Tel.číslo je potrebne vyplnit ',
-              })}
-            />
+            {fieldKeysRegister.map((key, index) => {
+              const { type, label, placeholder, pattern, patternMsg, requiredMsg } = registerFields[
+                key
+              ];
+              return (
+                <TextField
+                  key={key}
+                  fullWidth
+                  variant='outlined'
+                  label={label}
+                  placeholder={placeholder}
+                  name={key}
+                  type={type}
+                  id={key}
+                  error={errors.hasOwnProperty(key)}
+                  helperText={errors[key]?.message}
+                  inputRef={register({
+                    pattern: {
+                      // value: /^[a-zA-Z0-9_-]*$/,
+                      message: patternMsg,
+                    },
+                    required: requiredMsg,
+                  })}
+                />
+              );
+            })}
             <TextField
               fullWidth
               variant='outlined'
@@ -174,14 +153,10 @@ const Login = () => {
                 ),
               }}
             />
+            <Typography variant='subtitle1' component='h6' color='secondary'>
+              {resMsg}
+            </Typography>
             <Button fullWidth variant='contained' color='primary' type='submit'>
-              Registrovať sa
-            </Button>
-            <Button
-              fullWidth
-              variant='contained'
-              color='primary'
-              onClick={time}>
               Registrovať sa
             </Button>
           </form>
@@ -191,4 +166,17 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
+
+const useStyles = makeStyles((theme) => ({
+  _root: {
+    padding: '20px',
+    // textTransform: 'capitalize',
+    '& .MuiFormControl-root': {
+      margin: '5px 0 5px 0',
+    },
+    '& .MuiButton-root ': {
+      marginTop: '20px',
+    },
+  },
+}));

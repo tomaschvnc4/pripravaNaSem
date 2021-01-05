@@ -15,6 +15,7 @@ import RegisterPage from './pages/Register';
 
 //component
 import Navbar from './components/Navbar';
+import Car_add from './components/Car_add';
 
 //css
 import './App.css';
@@ -50,6 +51,7 @@ function App() {
         <Route path='/register'>
           <RegisterPage />
         </Route>
+        <Route path='/addCar/:id' children={<Car_add />}></Route>
         <Route path='/*'>
           <Error />
         </Route>

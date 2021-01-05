@@ -236,10 +236,10 @@ a {
   margin-top: 1rem;
 }
 
-/* ======== */
+/* ===LOGIN===== */
 
 .section2 {
-  height: 90vh;
+  /* height: 90vh; */
 }
 
 .login {
@@ -255,6 +255,17 @@ a {
 
 .login a:hover {
   color: var(--clr-nav-hoover);
+}
+
+/* =====ADD CAR Form========== */
+.addCar {
+  width: 450px;
+}
+/* --sideBar button */
+.sidebar-btn,
+.sidebar-btn:hover {
+  color: var(--clr-nav-hoover);
+  transition: var(--transition);
 }
 
 /* ===DISPLAY==== */
@@ -278,4 +289,8 @@ a {
 }
 .column-center button {
   margin-top: 2px;
+}
+
+.width-100 {
+  width: 100%;
 }

@@ -13,20 +13,17 @@ import Typography from '@material-ui/core/Typography';
 import { useGlobalContext } from '../context';
 
 const MyDialog = (props) => {
-  const { component: Component, title, text, handleDialog, open } = props;
+  // const {  } = useGlobalContext();
+  const { component: Component, title, text, handleDialog, open, id } = props;
+
   return (
     <div>
-      <Dialog
-        onClose={() => handleDialog()}
-        aria-labelledby='customized-dialog-title'
-        open={open}>
-        <DialogTitle
-          id='customized-dialog-title'
-          onClose={() => handleDialog()}>
+      <Dialog onClose={() => handleDialog()} aria-labelledby='customized-dialog-title' open={open}>
+        <DialogTitle id='customized-dialog-title' onClose={() => handleDialog()}>
           {title}
         </DialogTitle>
         <DialogContent dividers>
-          {Component && <Component />}
+          {Component && <Component id={id} />}
           {text}
         </DialogContent>
       </Dialog>
@@ -34,6 +31,10 @@ const MyDialog = (props) => {
   );
 };
 
+/**===========
+ * ==STYLEs===
+ * ===========
+ */
 const styles = (theme) => ({
   root: {
     margin: 0,
@@ -53,10 +54,7 @@ const DialogTitle = withStyles(styles)((props) => {
     <MuiDialogTitle disableTypography className={classes.root} {...other}>
       <Typography variant='h6'>{children}</Typography>
       {onClose ? (
-        <IconButton
-          aria-label='close'
-          className={classes.closeButton}
-          onClick={onClose}>
+        <IconButton aria-label='close' className={classes.closeButton} onClick={onClose}>
           <CloseIcon />
         </IconButton>
       ) : null}

@@ -4,6 +4,7 @@ const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const fs = require('fs');
 const bodyParser = require('body-parser');
+const { ifError } = require('assert');
 
 const app = express();
 
@@ -14,24 +15,6 @@ app.use(
     createParentPath: true,
   })
 );
-const carImagePath = './Public/Images/';
-
-const deleteImage = (filePath) => {
-  fs.stat(filePath, function (err, stats) {
-    console.log(stats); //here we got all information of file in stats variable
-
-    if (err) {
-      return console.error(err);
-    }
-
-    fs.unlink(filePath, function (err) {
-      if (err) return console.log(err);
-      console.log('file deleted successfully');
-    });
-  });
-  res.send('deleted');
-};
-//****img */
 
 app.use(express.json());
 app.use(cors());
@@ -52,15 +35,57 @@ const db = mysql.createPool({
   database: 'cruddb1',
 });
 
+const carImagePath = './Public/Images/';
+// const fileFath = './Public/Images/01fabia_small.png';
+const deleteImage = (fileFath) => {
+  console.log('DELETE TU');
+  console.log(fileFath);
+  fs.stat(fileFath, function (err, stats) {
+    console.log(stats); //here we got all information of file in stats variable
+
+    if (err) {
+      return console.error(err);
+    }
+
+    fs.unlink(fileFath, function (err) {
+      if (err) return console.log(err);
+      console.log('file deleted successfully');
+    });
+  });
+};
+
+const basicSelect = async (table = '', whatIWant = '', whereKey = '', paramWhere = '') => {
+  if (!table) return 'missing params';
+
+  whatIWant = whatIWant || '*';
+  if (!!whereKey && !paramWhere) return 'missing param'; //ak mam where key ale nemam hodnotu"
+
+  const sqlWhere = whereKey === '' ? '' : `WHERE ${whereKey} = ?`;
+  const sql = `SELECT ${whatIWant} FROM ${table} ${sqlWhere}`;
+  console.log(sql);
+  db.query(sql, paramWhere, (err, result) => {
+    err && console.log(err);
+    console.log('tu2');
+    console.log(result);
+    return result[0][whatIWant];
+  });
+  console.log('tu3');
+};
+//****img */
+
 // ==========================================
 
-app.get('/test', (req, res) => {
-  res.send('hello world');
-  deleteImage('./Public/Images/scr_overenie basic DB username.png');
+app.get('/test', async (req, res) => {
+  const tmp = await basicSelect('auta', 'image', 'id', 30);
+  console.log('tu');
+  console.log(tmp);
+  // res.send('test');
+  res.send(tmp);
+  // deleteImage();
 });
 
 //======IMG=============
-app.post('/picture/:spz', async (req, res) => {
+app.post('/picture/:spz', (req, res) => {
   const spz = req.params.spz;
   console.log(spz);
   try {
@@ -92,8 +117,10 @@ app.post('/picture/:spz', async (req, res) => {
 });
 
 //update
-app.put('/update/picture/:spz', async (req, res) => {
-  const spz = req.params.spz;
+app.put('/update/picture/:spz?/:path?', (req, res) => {
+  let { path, spz } = req.params;
+  console.log(req.params);
+  console.log(path);
   console.log(spz);
   try {
     if (!req.files) {
@@ -105,7 +132,7 @@ app.put('/update/picture/:spz', async (req, res) => {
       const { picture } = req.files;
       console.log(picture);
       console.log(picture.name);
-      const fullPath = carImagePath + picture.name;
+      const fullPath = carImagePath + spz + '_' + picture.name;
       picture.mv(`${fullPath}`);
 
       const sql = 'UPDATE auta SET image = ? WHERE spz = ?';
@@ -117,6 +144,10 @@ app.put('/update/picture/:spz', async (req, res) => {
         stat: true,
         msg: 'File is uploaded',
       });
+      path = carImagePath + path;
+      console.log('!!!!!path');
+      console.log(path);
+      deleteImage(path);
     }
   } catch (e) {
     res.status(500).send(e);
@@ -134,7 +165,6 @@ app.post('/register', (req, res) => {
 
     const dlzka = result.length;
     if (dlzka > 0) {
-      console.log('tu');
       const { email: _email, username: _username } = result[0];
       email === _email && (msg = 'Email sa uz pouziva');
       username === _username && (msg = 'Login sa uz pouziva');
@@ -202,6 +232,10 @@ app.post('/addCar', (req, res) => {
     (err, result) => {
       if (err) {
         console.log(err);
+        console.log(err.errno);
+        if (err.errno === 1062) {
+          msg = 'Auto s takouto SPZ už exituje';
+        }
       } else {
         msg = 'Auto pridané úspešne!';
         stat = true;
@@ -220,4 +254,53 @@ app.get('/getAuta', (req, res) => {
       res.send(result);
     }
   });
+});
+
+app.delete('/delete/car/:id', (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  let path = '';
+  let sql = 'SELECT image FROM auta WHERE id = ?';
+  db.query(sql, id, (err, result) => {
+    if (err) console.log(err);
+    const dlzka = result.length;
+    if (dlzka > 0) {
+      console.log(result);
+      path = result[0].image;
+      console.log(path);
+
+      deleteImage(path);
+    }
+
+    sql = 'DELETE FROM auta WHERE id = ?';
+    db.query(sql, id, (err2, result2) => {
+      if (err) return console.log(err);
+      res.send(`Úspešne zmazané auto s id: ${id}`);
+    });
+  });
+});
+
+app.put('/update/car', (req, res) => {
+  const { znacka, model, farba, spz, palivo, vykon, spotreba, cena, znamka, id } = req.body;
+  console.log(req.body);
+  let msg = '';
+  let stat = false;
+  let sql =
+    'UPDATE auta SET znacka = ?, model = ?, farba = ?, spz = ?, palivo = ?, vykon = ?, spotreba = ?, cena = ?, znamka = ? WHERE id = ?';
+  db.query(
+    sql,
+    [znacka, model, farba, spz, palivo, vykon, spotreba, cena, znamka, id],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        stat = false;
+      } else {
+        stat = true;
+        msq = 'uprava úspešná';
+        console.log('TU');
+        console.log(result);
+      }
+      res.send({ stat, msg });
+    }
+  );
 });

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams, Redirect } from 'react-router-dom';
 // import moment from 'moment';
 import Axios from 'axios';
 
 import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
 //MUI
 import {
@@ -15,6 +16,7 @@ import {
   Paper,
   TextField,
   Typography,
+  LinearProgress,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -73,50 +75,129 @@ const addCarFormSettings = {
 const fieldKeys = Object.keys(addCarFormSettings);
 console.log(fieldKeys);
 
-const pero = {
-  startAdornment: (
-    <IconButton size='small' color='primary'>
-      <CreateIcon />
-    </IconButton>
-  ),
-};
+// const schema = yup.object().shape({
+//   picture: yup
+//     .mixed()
+//     .required('Je potrebé vybrať obrázok!')
+//     .test('fileSize', 'Obrázok je príliš veľký', (value) => {
+//       return value && value[0].size <= 2000000; //2MB
+//     })
+//     .test('type', 'Nepodporovaný typ obrázku', (value) => {
+//       return value && value[0].type === 'image/jpg';
+//     }),
+// });
 
 const Car_add = () => {
   const classes = useStyles();
-  const { resMsg, handleResMsg } = useGlobalContext();
+  const {
+    resMsg,
+    handleResMsg,
+    isAdmin,
+    handleIsFetchData,
+    add_edit_car,
+    autoNaUpravu,
+    _setautoNaUpravu,
+    handleAdd_edit_car,
+  } = useGlobalContext();
   const { register, handleSubmit, errors } = useForm();
   //myState
-  //   const [isShowPass, setisShowPass] = useState(false);
   const [znamka, setZnamka] = useState(false);
-  const [file, setFile] = useState('');
-  const [fileName, setFileName] = useState('Vyber obrázok');
+  const [fileName, setFileName] = useState('');
+  const [allowSubmit, setAllowSubmit] = useState(true);
 
+  const { id } = useParams();
+  console.log(id);
+
+  const pridat = id === 'new' ? true : false;
   const onChange = (e) => {
-    setFile(e.target.files[0]);
-    setFileName(e.target.files[0].name);
+    e.target.files[0] && setFileName(e.target.files[0].name);
   };
 
-  const onSubmit = (data, e) => {
-    // e.target.reset();
+  const onSubmitEdit = (data, e) => {
     handleResMsg('');
-    let { spz } = data;
-    spz = spz.toUpperCase();
-
-    const tmp = { ...data, znamka, spz };
+    // e.preventDefault();
+    setAllowSubmit(false);
+    let spz = data.spz.toUpperCase();
+    const path = autoNaUpravu.image.slice(16);
+    console.log(path);
+    const tmp = { ...data, znamka, spz, id };
     console.log(tmp);
 
-    Axios.post('http://localhost:3001/addCar', {
-      ...tmp,
-      znamka,
-      img: file,
-    }).then((response) => {
-      handleResMsg(response.data.msg);
-    });
+    Axios.put('http://localhost:3001/update/car', { ...tmp }).then((response) =>
+      handleResMsg(response.data.msg)
+    );
+    if (data.picture[0]) {
+      const formData = new FormData();
+      formData.append('picture', data.picture[0]);
+      const props = { spz: spz, path: path };
+      console.log(props);
+      fetch(`http://localhost:3001/update/picture/${spz}/${path}`, {
+        method: 'PUT',
+        body: formData,
+      }).then((responseImg) => {
+        console.log('obrazok uploadnuty');
+      });
+    }
+    setTimeout(() => {
+      handleIsFetchData();
+      setAllowSubmit(true);
+    }, 1000);
   };
+
+  const onSubmitAdd = async (data, e) => {
+    if (fileName === '') {
+      handleResMsg('Obrázok je potrebné vybrať');
+    } else {
+      setAllowSubmit(false);
+      handleResMsg('');
+      let spz = data.spz.toUpperCase();
+      const tmp = { ...data, znamka, spz };
+      console.log(tmp);
+      const formData = new FormData();
+      formData.append('picture', data.picture[0]);
+
+      const response = await Axios.post('http://localhost:3001/addCar', {
+        ...tmp,
+        // znamka,
+      });
+      const { msg, stat } = await response.data;
+      if (stat) {
+        const resImg = await fetch(`http://localhost:3001/update/picture/${spz}`, {
+          method: 'PUT',
+          body: formData,
+        });
+        const dataRes = await resImg.json();
+        console.log(dataRes);
+      }
+      setTimeout(() => {
+        if (stat) {
+          e.target.reset();
+          setFileName('');
+          handleIsFetchData();
+        }
+        handleResMsg(msg);
+        setAllowSubmit(true);
+      }, 1000);
+    }
+  };
+
+  useEffect(() => {
+    if (id !== 'new') {
+      setZnamka(!!autoNaUpravu?.znamka);
+      console.log('useeffect');
+      console.log(znamka);
+    }
+  }, [znamka]);
 
   //   if (isLogin) {
   //     return <Redirect to={{ pathname: '/' }} />;
   //   }
+
+  // z d;vodu ked som na upravit auto a refresnem stranku chcecm aby som sa dostal na pridat nove auto lebo pri refresh sa mi resetnu staty ...cize b ostal prazny formular na upravu auta
+  if (add_edit_car.id === '' && id !== 'new') {
+    return <Redirect to={{ pathname: '/addCar/new' }} />;
+  }
+
   // ===RENDER===
   return (
     <section className='section2 center'>
@@ -127,13 +208,21 @@ const Car_add = () => {
               Zle meno/heslo
             </Typography> 
           )}*/}
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form
+            onSubmit={pridat ? handleSubmit(onSubmitAdd) : handleSubmit(onSubmitEdit)}
+            encType='multipart/form-data'>
             <div className='between-center'>
               <Typography variant='h4' component='h4' color='primary'>
-                Pridat auto
+                {pridat ? 'Pridať ' : 'Upraviť'} auto
               </Typography>
               <Link to='/'>
-                <IconButton color='primary' onClick={() => handleResMsg('')}>
+                <IconButton
+                  color='primary'
+                  onClick={() => {
+                    handleResMsg('');
+                    handleAdd_edit_car();
+                    _setautoNaUpravu({});
+                  }}>
                   <ArrowBackIcon />
                 </IconButton>
               </Link>
@@ -147,6 +236,7 @@ const Car_add = () => {
                     <TextField
                       fullWidth
                       variant='outlined'
+                      defaultValue={pridat ? '' : autoNaUpravu[key]}
                       label={label}
                       placeholder={placeholder}
                       name={key}
@@ -162,15 +252,10 @@ const Car_add = () => {
                         required: 'Toto pole je potrebné vyplniť ',
                       })}
                       InputProps={{
-                        //   startAdornment: (
-                        //     <IconButton size='small' color='primary'>
-                        //       <CreateIcon />
-                        //     </IconButton>
-                        //   ),
                         endAdornment: (
                           <InputAdornment position='start'>
                             {ozdoba && ozdoba}
-                            {true && (
+                            {!pridat && isAdmin && (
                               <IconButton size='small' color='primary'>
                                 <CreateIcon />
                               </IconButton>
@@ -203,20 +288,33 @@ const Car_add = () => {
                   id='icon-button-file'
                   type='file'
                   onChange={onChange}
+                  name='picture'
+                  ref={register}
                 />
                 <label htmlFor='icon-button-file' className={classes.labelfile}>
                   <IconButton color='primary' component='span'>
                     <PhotoCamera />
                   </IconButton>
-                  <TextField value={fileName} />
+                  <TextField
+                    value={fileName}
+                    placeholder={pridat ? '<= Vybrať obrázok' : '<= Zmeniť obrázok'}
+                    // ref={register(({required: 'Obrázok je potrebné vybrať'}))}
+                  />
                 </label>
               </Grid>
 
               <Typography variant='subtitle1' component='h6' color='secondary'>
                 {resMsg}
+                {errors.picture && <p>{errors.picture.message}</p>}
               </Typography>
-              <Button fullWidth variant='contained' color='primary' type='submit'>
-                Pridať auto
+              {!allowSubmit && <LinearProgress style={{ width: '100%' }} />}
+              <Button
+                fullWidth
+                variant='contained'
+                color='primary'
+                type='submit'
+                disabled={!allowSubmit}>
+                {pridat ? 'Pridať ' : 'Upraviť'} auto
               </Button>
             </Grid>
           </form>
@@ -231,18 +329,10 @@ export default Car_add;
 const useStyles = makeStyles((theme) => ({
   _root: {
     padding: '20px',
-    '& .MuiFormControl-root': {
-      //   margin: '5px 5px 5px 5px',
-    },
     '& .MuiButton-root ': {
       marginTop: '10px',
     },
   },
-  //   root: {
-  //     '& > *': {
-  //       margin: theme.spacing(1),
-  //     },
-  //   },
   inputfile: {
     display: 'none',
   },
