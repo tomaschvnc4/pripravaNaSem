@@ -141,11 +141,13 @@ const _List = (params) => {
   const { dataCars } = useGlobalContext();
 
   return (
-    <Grid container item xs={12} md={10} spacing={3} justify='space-around'>
+    // <Grid container item xs={12} md={10} spacing={2} justify='space-around'>
+    <Grid container item xs={12} md={10} spacing={2} justify='space-around'>
       {/* <SearchForm /> */}
       {dataCars.map((car, index) => {
         return (
-          <Grid item xs={12} sm={6} lg={4} xl={3} key={index}>
+          // <Grid item xs={12} sm={6} lg={4} xl={3} key={index}>
+          <Grid item xs={12} md={6} key={index}>
             {/* {console.log(car)} */}
             <Car {...car} />
           </Grid>

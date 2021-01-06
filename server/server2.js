@@ -25,10 +25,6 @@ app.use(
   })
 );
 app.use(bodyParser.urlencoded({ extended: true }));
-// cors({
-//   origin: ['http://localhost:3000'],
-//   methods: ['GET', 'POST'],
-//   credentials: true,
 
 app.listen(3001, () => {
   console.log('Server running on port 3001');
@@ -41,6 +37,8 @@ const db = mysql.createPool({
   database: 'cruddb1',
   // connectionLimit: 10,
 });
+
+//===========================================================================
 
 const carImagePath = './Public/Images/';
 // const fileFath = './Public/Images/01fabia_small.png';

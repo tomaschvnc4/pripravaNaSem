@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import moment from 'moment';
 import CarInfo from './Info';
 import MyDialog from './MyDialog';
@@ -25,7 +25,8 @@ import Axios from 'axios';
 
 const Car = (props) => {
   const classes = useStyles();
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [citatViac, setCitatViac] = useState(false);
 
   const {
     serverPath,
@@ -75,88 +76,94 @@ const Car = (props) => {
           open={isOpenDialogCar}
           id={id_auto}
         /> */}
-
-        <CardMedia
-          component='img'
-          className={classes.mymedia}
-          image={imgPath}
-          height='auto'
-          title='Contemplative Reptile'
-        />
-        <CardContent>
-          <div className={classes.title}>
-            <Typography variant='h4' component='h2'>
-              {model}
-            </Typography>
-            <Typography variant='h6' component='h6' color='primary'>
-              ...{cena}€/deň
-            </Typography>
+        <div>
+          <div className='display-row'>
+            <CardMedia
+              component='img'
+              className={classes.mymedia}
+              image={imgPath}
+              height='auto'
+              title='Contemplative Reptile'
+            />
+            <CardContent>
+              <div className={classes.title}>
+                <Typography variant='h5' component='h2'>
+                  {model}
+                </Typography>
+                <Typography variant='h6' component='h6' color='primary'>
+                  ...{cena}€/deň
+                </Typography>
+              </div>
+              <div className={classes._subtitle}>
+                <Typography gutterBottom variant='subtitle1' component='h2'>
+                  {znacka}
+                </Typography>
+                <Typography variant='subtitle2' component='h2'>
+                  {spz}
+                </Typography>
+              </div>
+              <Typography variant='body2' color='textPrimary' component='p' className='Citat-viac'>
+                {citatViac ? popis : `${popis.substring(0, 200)}...`}
+                <button onClick={() => setCitatViac(!citatViac)}>
+                  {citatViac ? ' menej' : ' viac'}
+                </button>
+              </Typography>
+            </CardContent>
           </div>
-          <div className={classes._subtitle}>
-            <Typography gutterBottom variant='subtitle1' component='h2'>
-              {znacka}
-            </Typography>
-            <Typography variant='subtitle2' component='h2'>
-              {spz}
-            </Typography>
-          </div>
-          <Typography variant='body2' color='textPrimary' component='p'>
-            {popis}
-          </Typography>
-        </CardContent>
 
-        <CardActions className={classes._actionBar}>
-          <div>
-            {/* <IconButton aria-label='add to favorites'>
+          <CardActions className={classes._actionBar}>
+            <div>
+              {/* <IconButton aria-label='add to favorites'>
               <Badge badgeContent={4} color='secondary'>
-                <FavoriteIcon />
+              <FavoriteIcon />
               </Badge>
             </IconButton> */}
-            {isAdmin && (
-              <>
-                <IconButton
-                  size='small'
-                  color='primary'
-                  onClick={() => handleAdd_edit_car(true, id_auto)}>
-                  <CreateIcon />
-                </IconButton>
-                {!pozicane && (
+              {isAdmin && (
+                <>
                   <IconButton
-                    aria-label='delete'
-                    color='secondary'
-                    onClick={() => deleteCar(id_auto)}>
-                    <DeleteIcon />
+                    size='small'
+                    color='primary'
+                    onClick={() => handleAdd_edit_car(true, id_auto)}>
+                    <CreateIcon />
                   </IconButton>
-                )}
-              </>
-            )}
+                  {!pozicane && (
+                    <IconButton
+                      aria-label='delete'
+                      color='secondary'
+                      onClick={() => deleteCar(id_auto)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  )}
+                </>
+              )}
 
-            <Button
-              size='small'
-              color='primary'
-              onClick={() => setExpanded(!expanded)}
-              // onClick={() => handleDialogCar()}
-              aria-expanded={expanded}>
-              Viac info
-            </Button>
-          </div>
-          <div className={classes._disableButton}>
-            <ThemeProvider theme={themeGreen}>
               <Button
                 size='small'
-                variant='outlined'
                 color='primary'
-                disabled={isLogin ? (pozicane ? true : false) : true}
-                onClick={() => onClickPozicat()}
-                // disabled
-              >
-                <p>
-                  Požičať <small>{!isLogin && '(po prihlásení)'}</small>
-                </p>
+                onClick={() => setExpanded(!expanded)}
+                // onClick={() => handleDialogCar()}
+                aria-expanded={expanded}>
+                Viac info
               </Button>
-            </ThemeProvider>
-          </div>
-        </CardActions>
+            </div>
+            <div className={classes._disableButton}>
+              <ThemeProvider theme={themeGreen}>
+                <Button
+                  size='small'
+                  variant='outlined'
+                  color='primary'
+                  disabled={isLogin ? (pozicane ? true : false) : true}
+                  onClick={() => onClickPozicat()}
+                  // disabled
+                >
+                  <p>
+                    Požičať <small>{!isLogin && '(po prihlásení)'}</small>
+                  </p>
+                </Button>
+              </ThemeProvider>
+            </div>
+          </CardActions>
+        </div>
         <Collapse in={expanded} timeout='auto' unmountOnExit>
           <CardContent>
             <CarInfo id={id_auto} typ={'car'} />
@@ -174,14 +181,14 @@ const useStyles = makeStyles((theme) => ({
   _rootContainer: {
     display: 'flex',
     justifyContent: 'center',
-    // backgroundColor: '#000000',
   },
 
   _main: {
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'column',
-    maxWidth: 345,
+    // maxWidth: 345,
+    maxWidth: '95%',
 
     boxShadow: theme.shadows[5],
     '&:hover': {

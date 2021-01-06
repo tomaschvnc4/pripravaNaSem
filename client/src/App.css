@@ -291,6 +291,14 @@ a {
   margin-top: 2px;
 }
 
+.display-row {
+  display: flex;
+  flex-direction: row;
+}
+.display-row img {
+  object-fit: contain;
+}
+
 .width-100 {
   width: 100%;
 }
@@ -303,4 +311,18 @@ Search
 .search {
   margin-top: 1rem;
   padding-bottom: 0;
+}
+/* 
+===========
+Citat viac
+===========
+*/
+.Citat-viac button {
+  background: transparent;
+  border-color: transparent;
+  text-transform: capitalize;
+  color: hsl(205, 78%, 60%);
+  font-size: 1rem;
+  cursor: pointer;
+  padding-left: 0.25rem;
 }
