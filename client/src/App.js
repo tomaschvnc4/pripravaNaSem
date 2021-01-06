@@ -31,7 +31,7 @@ function App() {
         </Route>
         <Route path='/vypozicky'>
           <Navbar />
-          <Vypozicky />
+          <A_vypozicky />
         </Route>
         <Route path='/about'>
           <Navbar />

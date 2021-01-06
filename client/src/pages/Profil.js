@@ -5,11 +5,18 @@ import { Card, CardContent, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Info from '../components/Info';
+import Loading from '../components/Loading';
+import { Redirect } from 'react-router-dom';
 
 const Profil = () => {
-  const { user } = useGlobalContext();
+  const { user, isLogin, isLoading } = useGlobalContext();
   const classes = useStyles();
-
+  if (!isLogin) {
+    return <Redirect to={{ pathname: '/' }} />;
+  }
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
     <section className='center login width-100'>
       <Grid container spacing={1} justify='center'>

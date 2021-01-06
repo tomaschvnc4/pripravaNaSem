@@ -3,8 +3,9 @@ import { Link, useParams, Redirect } from 'react-router-dom';
 // import moment from 'moment';
 import Axios from 'axios';
 
-import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+import Loading from './Loading';
+import { useForm } from 'react-hook-form';
 
 //MUI
 import {
@@ -98,6 +99,8 @@ const Car_add = () => {
     autoNaUpravu,
     _setautoNaUpravu,
     handleAdd_edit_car,
+    isLoading,
+    isLogin,
   } = useGlobalContext();
   const { register, handleSubmit, errors } = useForm();
   //myState
@@ -199,6 +202,13 @@ const Car_add = () => {
   }
 
   // ===RENDER===
+  if (!isLogin) {
+    return <Redirect to={{ pathname: '/' }} />;
+  }
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <section className='section2 center'>
       <div className='addCar'>
@@ -267,6 +277,18 @@ const Car_add = () => {
                   </Grid>
                 );
               })}
+              <Grid item xs={12}>
+                <TextField
+                  style={{ width: '100%' }}
+                  id='popis'
+                  label='popis'
+                  multiline
+                  placeholder='Popis'
+                  variant='outlined'
+                  name='popis'
+                  inputRef={register}
+                />
+              </Grid>
 
               <Grid item xs={12} md={6}>
                 <FormControlLabel
@@ -302,7 +324,6 @@ const Car_add = () => {
                   />
                 </label>
               </Grid>
-
               <Typography variant='subtitle1' component='h6' color='secondary'>
                 {resMsg}
                 {errors.picture && <p>{errors.picture.message}</p>}

@@ -1,5 +1,5 @@
 import React from 'react';
-import img from '../img/01fabia_small.png';
+import moment from 'moment';
 import CarInfo from './Info';
 import MyDialog from './MyDialog';
 
@@ -29,18 +29,37 @@ const Car = (props) => {
 
   const {
     serverPath,
-    handleDialogCar,
-    isOpenDialogCar,
+    // handleDialogCar,
+    // isOpenDialogCar,
     isAdmin,
     handleAdd_edit_car,
     handleIsFetchData,
+    user,
+    isLogin,
   } = useGlobalContext();
 
-  const { id, image, model, cena, znacka, spz, popis } = props;
+  const { id: id_auto, image, model, cena, znacka, spz, popis, pozicane } = props;
+  const { id: id_zakaznik } = user;
   let imgPath = serverPath + image.slice(8);
 
-  const deleteCar = async (id) => {
-    const response = await Axios.delete(`http://localhost:3001/delete/car/${id}`);
+  const deleteCar = async (id_auto) => {
+    const response = await Axios.delete(`http://localhost:3001/delete/car/${id_auto}`);
+    handleIsFetchData();
+  };
+
+  const pozicatAuto = async (id_auto) => {
+    // const time = moment.now();
+    const d_rezervacie = moment.now();
+    console.log(d_rezervacie);
+
+    const newVypozicka = { id_auto, id_zakaznik, d_rezervacie };
+    const response = await Axios.post('http://localhost:3001/vypozicka/add', {
+      ...newVypozicka,
+    });
+    console.log(response.data);
+  };
+  const onClickPozicat = () => {
+    pozicatAuto(id_auto);
     handleIsFetchData();
   };
 
@@ -54,7 +73,7 @@ const Car = (props) => {
           title='BA555XX'
           handleDialog={handleDialogCar}
           open={isOpenDialogCar}
-          id={id}
+          id={id_auto}
         /> */}
 
         <CardMedia
@@ -78,7 +97,6 @@ const Car = (props) => {
               {znacka}
             </Typography>
             <Typography variant='subtitle2' component='h2'>
-              {/* BA555XX */}
               {spz}
             </Typography>
           </div>
@@ -99,10 +117,13 @@ const Car = (props) => {
                 <IconButton
                   size='small'
                   color='primary'
-                  onClick={() => handleAdd_edit_car(true, id)}>
+                  onClick={() => handleAdd_edit_car(true, id_auto)}>
                   <CreateIcon />
                 </IconButton>
-                <IconButton aria-label='delete' color='secondary' onClick={() => deleteCar(id)}>
+                <IconButton
+                  aria-label='delete'
+                  color='secondary'
+                  onClick={() => deleteCar(id_auto)}>
                   <DeleteIcon />
                 </IconButton>
               </>
@@ -123,16 +144,20 @@ const Car = (props) => {
                 size='small'
                 variant='outlined'
                 color='primary'
+                disabled={isLogin ? (pozicane ? true : false) : true}
+                onClick={() => onClickPozicat()}
                 // disabled
               >
-                Požičať
+                <p>
+                  Požičať <small>{!isLogin && '(po prihlásení)'}</small>
+                </p>
               </Button>
             </ThemeProvider>
           </div>
         </CardActions>
         <Collapse in={expanded} timeout='auto' unmountOnExit>
           <CardContent>
-            <CarInfo id={id} typ={'car'} />
+            <CarInfo id={id_auto} typ={'car'} />
           </CardContent>
         </Collapse>
       </Card>

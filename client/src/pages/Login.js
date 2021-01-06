@@ -12,11 +12,6 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import { useGlobalContext } from '../context';
 
-const logint = {
-  login: 'jano',
-  heslo: 'jano1',
-};
-
 const Login = () => {
   const classes = useStyles();
   const {
@@ -27,6 +22,7 @@ const Login = () => {
     resMsg,
     handleResMsg,
     handleUser,
+    prihlasenie,
   } = useGlobalContext();
 
   const { register, handleSubmit, errors } = useForm();
@@ -35,38 +31,28 @@ const Login = () => {
 
   const onSubmit = (data, e) => {
     e.target.reset();
-    console.log(data);
-    const { username, heslo } = data;
-    handleResMsg('');
-    // Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/login', {
-      ...data,
-    }).then((response) => {
-      const { stat, msg, newUser } = response.data;
-      console.log(newUser);
-      if (stat === true) {
-        console.log('logged');
-        handleIsFailed(false);
-        handleLogin(true);
-        handleResMsg('');
-        handleUser({ ...newUser });
-      } else {
-        console.log('failed');
-        handleIsFailed(true);
-        handleResMsg(msg);
-      }
-    });
-    //   if (login === logint.login && heslo === logint.heslo) {
+    prihlasenie(data);
+    // console.log(data);
+    //     const { username, heslo } = data;
+    // handleResMsg('');
+    //----/// Axios.defaults.withCredentials = true;
+    // Axios.post('http://localhost:3001/login', {
+    //   ...data,
+    // }).then((response) => {
+    //   const { stat, msg, newUser } = response.data;
+    //   console.log(newUser);
+    //   if (stat === true) {
     //     console.log('logged');
     //     handleIsFailed(false);
     //     handleLogin(true);
-    //     //return <Redirect to={{ pathname: '/' }} />;
+    //     handleResMsg('');
+    //     handleUser({ ...newUser });
     //   } else {
     //     console.log('failed');
     //     handleIsFailed(true);
+    //     handleResMsg(msg);
     //   }
-    // };
-    // console.log(isFaild);
+    // });
   };
   if (isLogin) {
     return <Redirect to={{ pathname: '/' }} />;

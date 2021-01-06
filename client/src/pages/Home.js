@@ -5,7 +5,7 @@ import { useGlobalContext } from '../context';
 
 const Home = () => {
   // const { showNav } = useGlobalContext();
-
+  console.log('Home');
   return (
     <div>
       Home

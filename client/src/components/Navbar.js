@@ -25,15 +25,11 @@ const Navbar = () => {
 
   const {
     isLogin,
-    handleLogin,
-    handleDialogLogOut,
     isOpenDialogLogOut,
+    fetchVypozicky,
+    handleDialogLogOut,
+    odhlasenie,
   } = useGlobalContext();
-
-  const handleLogOut = (params) => {
-    handleLogin(params);
-    handleDialogLogOut();
-  };
 
   let t1, t2;
   const stopTimeOut = () => {
@@ -44,8 +40,7 @@ const Navbar = () => {
   //prisposobi sa velkost podla poctu linkov
   useEffect(() => {
     if (showLinks) {
-      linksHeight.current =
-        document.querySelectorAll('.show-container > li').length * 34;
+      linksHeight.current = document.querySelectorAll('.show-container > li').length * 34;
       linksRef.current.style.height = `${linksHeight.current}px`;
       linksRef.current.style.position = `inherit`;
     } else {
@@ -76,10 +71,7 @@ const Navbar = () => {
       />
       <Grid container justify='center'>
         <Grid item xs={12} sm={10}>
-          <AppBar
-            position='static'
-            elevation={24}
-            style={{ borderRadius: '15px' }}>
+          <AppBar position='static' elevation={24} style={{ borderRadius: '15px' }}>
             <Toolbar className='ahoj nav-center'>
               <Link to='/'>
                 <img src={myIcon} alt='logo' />
@@ -93,7 +85,7 @@ const Navbar = () => {
                 <MenuIcon />
               </button>
               <Links1 />
-              {isLogin && <Links2 handleLogOut={handleLogOut} />}
+              {isLogin && <Links2 />}
             </Toolbar>
             {/* {<ColumnLinks showLinks linksRef></ColumnLinks>} */}
             <ul className={`nav-links show-container`} ref={linksRef}>
@@ -105,7 +97,9 @@ const Navbar = () => {
               </li>
               <li>
                 {isLogin ? (
-                  <Link to='/vypozicky'>výpožičky</Link>
+                  <Link to='/vypozicky' onClick={() => fetchVypozicky()}>
+                    výpožičky
+                  </Link>
                 ) : (
                   <Link to='/login'>login/register</Link>
                 )}
@@ -119,7 +113,7 @@ const Navbar = () => {
                 <>
                   <li>
                     <Link to='/admin'>
-                      <BuildIcon />
+                      <BuildIcon onClick={() => fetchVypozicky()} />
                       dummy
                     </Link>
                   </li>
@@ -130,7 +124,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link to='/'>
-                        <ExitToAppIcon onClick={() => handleLogOut(false)} />
+                        <ExitToAppIcon onClick={() => odhlasenie()} />
                       </Link>
                     </span>
                   </li>
@@ -147,7 +141,7 @@ const Navbar = () => {
 export default Navbar;
 
 const Links1 = () => {
-  const { isLogin } = useGlobalContext();
+  const { isLogin, fetchVypozicky } = useGlobalContext();
   return (
     <ul className={`nav-links `}>
       <li>
@@ -155,7 +149,9 @@ const Links1 = () => {
       </li>
       <li>
         {isLogin ? (
-          <Link to='/vypozicky'>výpožičky</Link>
+          <Link to='/vypozicky' onClick={() => fetchVypozicky()}>
+            výpožičky
+          </Link>
         ) : (
           <Link to='/login'>login/register</Link>
         )}
@@ -167,11 +163,14 @@ const Links1 = () => {
   );
 };
 
-const Links2 = ({ handleLogOut }) => {
+const Links2 = () => {
+  const { fetchVypozicky, odhlasenie } = useGlobalContext();
   return (
     <ul className={`nav-links `}>
       <li>
-        <Link to='/admin'>dummy</Link>
+        <Link to='/admin' onClick={() => fetchVypozicky()}>
+          dummy
+        </Link>
       </li>
       <li>
         <Link to='/profil'>
@@ -180,7 +179,7 @@ const Links2 = ({ handleLogOut }) => {
       </li>
       <li>
         <Link to='/'>
-          <ExitToAppIcon onClick={() => handleLogOut(false)} />
+          <ExitToAppIcon onClick={() => odhlasenie()} />
         </Link>
       </li>
     </ul>

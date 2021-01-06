@@ -1,7 +1,9 @@
-import axios from 'axios';
+import Axios from 'axios';
 import React, { useState, useContext, useEffect } from 'react';
+import moment from 'moment';
 
 import dataFile from './cars_data';
+import { Redirect } from 'react-router-dom';
 
 const AppContext = React.createContext();
 
@@ -22,11 +24,11 @@ const defaultValues = {
   },
 };
 let stiahnuteData = {};
-
+Axios.defaults.withCredentials = true;
 const AppProvider = ({ children }) => {
   const serverPath = 'http://localhost:3001';
   const [isLoading, setIsLoading] = useState(true);
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(false);
   const [isFaild, setIsFaild] = useState(false);
   //const [isOpenDialogCar, setOpenDialogCar] = useState(false);
   const [isOpenDialogLogOut, setOpenDialogLogOut] = useState(false);
@@ -36,10 +38,13 @@ const AppProvider = ({ children }) => {
   const [autoNaUpravu, setautoNaUpravu] = useState({});
   const [resMsg, setResMsg] = useState('');
   const [dataCars, setDataCars] = useState([]);
+  const [idPozicane, setIdPozicane] = useState([]);
+  const [dataVypozicky, setDataVypozicky] = useState([]);
   const [kategorie, setKategorie] = useState([]); //unikatn ekategorie
   const [pocetVKat, setPocetVKat] = useState({ kategoria: 0 }); //kategoria ==key ... kategoria :pocet
   const [add_edit_car, setAdd_edit_car] = useState(defaultValues.add_edit_car);
   const [user, setUser] = useState(defaultValues.user);
+  const [searchTerm, setSearchTerm] = useState('');
 
   //=====basic METORY=====
   const handleLogin = (val) => setIsLogin(val);
@@ -86,19 +91,89 @@ const AppProvider = ({ children }) => {
     }
   };
 
+  const handleUser = (newUser) => {
+    console.log(newUser);
+    setUser(newUser ? newUser : defaultValues.user);
+  };
+
+  const odhlasenie = () => {
+    setOpenDialogLogOut(!isOpenDialogLogOut);
+    setIsAdmin(false);
+    setDataVypozicky([]);
+    setIsLogin(false);
+    setUser({});
+  };
+
+  const prihlasenie = async (data) => {
+    console.log(data);
+    setResMsg('');
+    const response = await Axios.post('http://localhost:3001/login', {
+      ...data,
+    });
+    const { stat, msg, newUser } = response.data;
+    console.log(newUser);
+    if (stat) {
+      console.log('logged');
+      setIsFaild(false);
+      setIsLogin(true);
+      resMsg || setResMsg(''); //ak resMsg je daka sprava tak vynuluj
+      handleUser({ ...newUser });
+    } else {
+      console.log('failed');
+      setIsFaild(true);
+      setResMsg(msg);
+    }
+  };
+
   const fetchAuta = async () => {
     setIsLoading(true);
-    const response = await axios.get('http://localhost:3001/getAuta');
-    console.log(response);
-    stiahnuteData = [...response.data]; //urobim kopiu nie referenciu
-    setDataCars(response.data);
+    const responseAuta = await Axios.get('http://localhost:3001/getAuta');
+    console.log(responseAuta);
+    const responsePozicaneAutaId = await Axios.get('http://localhost:3001/vypozicka/pozicaneID');
+    const idPozicaneArray = responsePozicaneAutaId.data.result;
+    // stiahnuteData = [...responseAuta.data]; //urobim kopiu nie referenciu --'vysyspem'vsetko z data do stiahnute
+    stiahnuteData = responseAuta.data.map((auto) => {
+      //ak mi vrati objekt auto je pozicane ulozim si TRUE ak nie je pozicane vrati undefined a tak vratim FALSE
+      let pozicane = idPozicaneArray.find((objResult) => auto.id === objResult.id_auto)
+        ? true
+        : false;
+      return { ...auto, pozicane }; //tu vlastne pridam k autam atribut ci je pozicane alebo nie
+    });
+    console.log(stiahnuteData);
+    setDataCars(stiahnuteData);
     nastavKategorie();
     setIsLoading(false);
   };
 
-  const handleUser = (newUser) => {
-    console.log(newUser);
-    setUser(newUser ? newUser : defaultValues.user);
+  const fetchVypozicky = async () => {
+    setIsLoading(true);
+    const { id } = user;
+    const response = await Axios.get(`http://localhost:3001/vypozicky/get/${isAdmin}/${id}`);
+    console.log(response.data);
+    let { result } = response.data;
+    const tmp = { ...result };
+    result.sort((a, b) => b.id - a.id);
+    setDataVypozicky(result);
+    console.log('fetch');
+    setIsLoading(false);
+  };
+
+  const zmazVypozicku = async (id_vypozicka) => {
+    setIsLoading(true);
+    let response = await Axios.delete(`http://localhost:3001/vypozicka/delete/${id_vypozicka}`);
+    console.log(response.data);
+    fetchVypozicky();
+    setIsLoading(false);
+  };
+
+  const potvrdPozicanie = async ({ id_vypozicka, column }) => {
+    const datum = moment.now();
+    // console.log(props);
+    let response = await Axios.put(
+      `http://localhost:3001/vypozicka/update/${column}/${datum}/${id_vypozicka}`
+    );
+    fetchVypozicky();
+    fetchAuta();
   };
 
   useEffect(() => {
@@ -140,6 +215,13 @@ const AppProvider = ({ children }) => {
         autoNaUpravu,
         user,
         handleUser,
+        dataVypozicky,
+        fetchVypozicky,
+        zmazVypozicku,
+        potvrdPozicanie,
+        odhlasenie,
+        prihlasenie,
+        setSearchTerm,
       }}>
       {children}
     </AppContext.Provider>
