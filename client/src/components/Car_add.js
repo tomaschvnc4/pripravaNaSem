@@ -126,7 +126,7 @@ const Car_add = () => {
     const tmp = { ...data, znamka, spz, id };
     console.log(tmp);
 
-    Axios.put('http://localhost:3001/update/car', { ...tmp }).then((response) =>
+    Axios.put('http://localhost:3001/auta/update', { ...tmp }).then((response) =>
       handleResMsg(response.data.msg)
     );
     if (data.picture[0]) {
@@ -134,7 +134,7 @@ const Car_add = () => {
       formData.append('picture', data.picture[0]);
       const props = { spz: spz, path: path };
       console.log(props);
-      fetch(`http://localhost:3001/update/picture/${spz}/${path}`, {
+      fetch(`http://localhost:3001/auta/update/picture/${spz}/${path}`, {
         method: 'PUT',
         body: formData,
       }).then((responseImg) => {
@@ -159,13 +159,13 @@ const Car_add = () => {
       const formData = new FormData();
       formData.append('picture', data.picture[0]);
 
-      const response = await Axios.post('http://localhost:3001/addCar', {
+      const response = await Axios.post('http://localhost:3001/auta/add', {
         ...tmp,
         // znamka,
       });
       const { msg, stat } = await response.data;
       if (stat) {
-        const resImg = await fetch(`http://localhost:3001/update/picture/${spz}`, {
+        const resImg = await fetch(`http://localhost:3001/auta/update/picture/${spz}`, {
           method: 'PUT',
           body: formData,
         });
@@ -286,6 +286,7 @@ const Car_add = () => {
                   placeholder='Popis'
                   variant='outlined'
                   name='popis'
+                  defaultValue={pridat ? '' : autoNaUpravu['popis']}
                   inputRef={register}
                 />
               </Grid>

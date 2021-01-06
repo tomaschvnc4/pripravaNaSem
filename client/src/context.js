@@ -128,7 +128,7 @@ const AppProvider = ({ children }) => {
 
   const fetchAuta = async () => {
     setIsLoading(true);
-    const responseAuta = await Axios.get('http://localhost:3001/getAuta');
+    const responseAuta = await Axios.get('http://localhost:3001/auta/getAuta');
     console.log(responseAuta);
     const responsePozicaneAutaId = await Axios.get('http://localhost:3001/vypozicka/pozicaneID');
     const idPozicaneArray = responsePozicaneAutaId.data.result;
@@ -149,7 +149,7 @@ const AppProvider = ({ children }) => {
   const fetchVypozicky = async () => {
     setIsLoading(true);
     const { id } = user;
-    const response = await Axios.get(`http://localhost:3001/vypozicky/get/${isAdmin}/${id}`);
+    const response = await Axios.get(`http://localhost:3001/vypozicka/get/${isAdmin}/${id}`);
     console.log(response.data);
     let { result } = response.data;
     const tmp = { ...result };

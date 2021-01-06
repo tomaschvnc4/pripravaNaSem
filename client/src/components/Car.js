@@ -44,7 +44,7 @@ const Car = (props) => {
   let imgPath = serverPath + image.slice(8);
 
   const deleteCar = async (id_auto) => {
-    const response = await Axios.delete(`http://localhost:3001/delete/car/${id_auto}`);
+    const response = await Axios.delete(`http://localhost:3001/auta/delete/${id_auto}`);
     handleIsFetchData();
   };
 

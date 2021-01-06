@@ -19,7 +19,7 @@ const registerFields = {
     type: 'text',
     label: 'Meno(*)',
     placeholder: 'Meno',
-    pattern: /^[a-zA-Z0-9_-]*$/,
+    pattern: /^[a-zA-Z0-9]*$/,
     patternMsg: 'Meno obsahuje nepovolené znaky.',
     requiredMsg: 'Meno je potrebné vyplniť.',
   },
