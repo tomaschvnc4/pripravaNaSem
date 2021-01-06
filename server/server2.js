@@ -3,7 +3,7 @@ const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 
-const db = require('../database');
+const db = require('./database');
 const app = express();
 
 //****img */
