@@ -1,5 +1,5 @@
 const express = require('express');
-const mysql = require('mysql2');
+const mysql = require('mysql');
 // const mysql = require('mysql2/promise');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
@@ -39,12 +39,13 @@ const db = mysql.createPool({
   user: 'tomas',
   password: 'tomas',
   database: 'cruddb1',
+  // connectionLimit: 10,
 });
 
 const carImagePath = './Public/Images/';
 // const fileFath = './Public/Images/01fabia_small.png';
 const deleteImage = (fileFath) => {
-  console.log('DELETE TU');
+  console.log('DELETE OBR TU');
   console.log(fileFath);
   fs.stat(fileFath, function (err, stats) {
     console.log(stats); //here we got all information of file in stats variable
@@ -163,6 +164,7 @@ app.put('/update/picture/:spz?/:path?', (req, res) => {
       });
       path = carImagePath + path;
       deleteImage(path);
+      res.send({ stat, msg });
     }
   } catch (e) {
     res.status(500).send(e);
@@ -175,24 +177,39 @@ app.post('/register', (req, res) => {
   // console.log(req.body);
   let sql = 'SELECT * FROM user WHERE email=? OR username=?';
   let msg = '';
+  let stat = false;
+  let wait = true;
+
   db.query(sql, [email, username], (err, result) => {
     err && console.log(err);
 
     const dlzka = result.length;
+    console.log(dlzka);
     if (dlzka > 0) {
       const { email: _email, username: _username } = result[0];
       email === _email && (msg = 'Email sa uz pouziva');
       username === _username && (msg = 'Login sa uz pouziva');
     } else {
+      stat = true; ///!!!!len aby prislo daco ale necaka to ci ozaj sa vlozilo
+      msg = msg || 'Registrácia prebehla úspešne!';
       sql = 'INSERT INTO user (meno, heslo, email, telefon,username) VALUES (?,?,?,?,?)';
-      db.query(sql, [meno, heslo, email, telefon, username], (err, result) => {
-        if (err) {
-          console.log(err);
+      console.log('REGISTER');
+      db.query(sql, [meno, heslo, email, telefon, username], (err2, result2) => {
+        if (err2) {
+          console.log(err2);
+          msg = 'Err:500 chyba pri registraci';
+          wait = false;
+        } else {
+          stat = true;
+          msg = 'Registrácia prebehla úspešne!';
+          wait = false;
         }
-        msg = 'Registrácia prebehla úspešne!';
+        console.log(msg);
+        // res.send({ msg: msg, stat: stat });
       });
     }
-    res.send({ msg });
+    //neposle mi to "Registrácia prebehla úspešne!'" lebo await nefunguje cize nepocka
+    res.send({ msg: msg, stat: stat });
   });
 });
 
@@ -277,10 +294,12 @@ app.get('/getAuta', async (req, res) => {
 });
 
 app.delete('/delete/car/:id', (req, res) => {
+  console.log('DELETE AUTO');
   const id = req.params.id;
-  // console.log(id);
+  console.log(id);
   let path = '';
   let sql = 'SELECT image FROM auta WHERE id = ?';
+  console.log(sql);
   db.query(sql, id, (err, result) => {
     if (err) console.log(err);
     const dlzka = result.length;
@@ -293,8 +312,9 @@ app.delete('/delete/car/:id', (req, res) => {
     }
 
     sql = 'DELETE FROM auta WHERE id = ?';
-    db.query(sql, id, (err2, result2) => {
-      if (err) return console.log(err);
+    console.log(sql);
+    db.query(sql, id, (err, result) => {
+      if (err) console.log(err);
       res.send(`Úspešne zmazané auto s id: ${id}`);
     });
   });
@@ -313,7 +333,6 @@ app.put('/update/car', (req, res) => {
     (err, result) => {
       if (err) {
         console.log(err);
-        stat = false;
       } else {
         stat = true;
         msg = 'uprava úspešná';

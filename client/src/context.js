@@ -23,7 +23,7 @@ const defaultValues = {
     isAdmin: false,
   },
 };
-let stiahnuteData = {};
+let stiahnuteData = [];
 Axios.defaults.withCredentials = true;
 const AppProvider = ({ children }) => {
   const serverPath = 'http://localhost:3001';
@@ -66,6 +66,7 @@ const AppProvider = ({ children }) => {
   const _setautoNaUpravu = (val) => setautoNaUpravu(val);
 
   //=======METODY==========
+
   const nastavKategorie = () => {
     let allKategorie = ['Všetky', ...new Set(stiahnuteData.map((car) => car.znacka))];
     let allKategorieobj = {};
@@ -164,6 +165,7 @@ const AppProvider = ({ children }) => {
     console.log(response.data);
     fetchVypozicky();
     setIsLoading(false);
+    fetchAuta();
   };
 
   const potvrdPozicanie = async ({ id_vypozicka, column }) => {
@@ -179,6 +181,11 @@ const AppProvider = ({ children }) => {
   useEffect(() => {
     fetchAuta();
   }, [isFetchData]);
+
+  useEffect(() => {
+    const results = stiahnuteData.filter((item) => item.model.toLowerCase().includes(searchTerm));
+    results && setDataCars(results);
+  }, [searchTerm]);
 
   // useEffect(() => {
   //   setAdd_edit_car(defaultValues.add_edit_car);

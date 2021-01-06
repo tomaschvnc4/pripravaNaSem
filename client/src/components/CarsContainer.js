@@ -12,6 +12,7 @@ import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import { useGlobalContext } from '../context';
 import { green } from '@material-ui/core/colors';
 import Car_add from './Car_add';
+import SearchForm from './SearchForm';
 
 const useStyles = makeStyles((theme) => ({
   _width: {
@@ -81,6 +82,7 @@ const CarsContainer = () => {
     <section>
       <Grid container direction='row' justify='space-around'>
         <_SideBar />
+
         <_List />
       </Grid>
     </section>
@@ -140,6 +142,7 @@ const _List = (params) => {
 
   return (
     <Grid container item xs={12} md={10} spacing={3} justify='space-around'>
+      {/* <SearchForm /> */}
       {dataCars.map((car, index) => {
         return (
           <Grid item xs={12} sm={6} lg={4} xl={3} key={index}>

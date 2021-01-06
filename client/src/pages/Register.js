@@ -53,22 +53,28 @@ console.log(fieldKeysRegister);
 
 const Register = () => {
   const classes = useStyles();
-  const { isFaild, handleIsFailed, resMsg, handleResMsg } = useGlobalContext();
+  const { handleIsFailed, resMsg, handleResMsg } = useGlobalContext();
   const { register, handleSubmit, errors } = useForm();
   //myState
   const [isShowPass, setisShowPass] = useState(false);
+  const [isResgistraciaUspesna, setisResgistraciaUspesna] = useState(false);
 
-  const onSubmit = (data, e) => {
+  const onSubmit = async (data, e) => {
     // e.target.reset();
     handleResMsg('');
     const tmp = { ...data };
     console.log(tmp);
 
-    Axios.post('http://localhost:3001/register', {
+    const response = await Axios.post('http://localhost:3001/register', {
       ...data,
-    }).then((response) => {
-      handleResMsg(response.data.msg);
     });
+    console.log(response);
+    handleResMsg(response.data.msg);
+    console.log(response.data.msg);
+    console.log(response.data.stat);
+    if (response.data.stat) {
+      setisResgistraciaUspesna(true);
+    }
   };
 
   const time = () => {
@@ -82,19 +88,14 @@ const Register = () => {
     // }, 500);
   };
 
-  //   if (isLogin) {
-  //     return <Redirect to={{ pathname: '/' }} />;
-  //   }
+  if (isResgistraciaUspesna) {
+    return <Redirect to={{ pathname: '/login' }} />;
+  }
   // ===RENDER===
   return (
     <section className='section2 center'>
       <div className='login'>
         <Paper elevation={5} className={classes._root}>
-          {isFaild && (
-            <Typography variant='subtitle1' component='h6' color='secondary'>
-              Zle meno/heslo
-            </Typography>
-          )}
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className='between-center'>
               <Typography variant='h4' component='h4' color='primary'>

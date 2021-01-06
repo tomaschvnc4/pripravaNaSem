@@ -84,7 +84,7 @@ const Car = (props) => {
           title='Contemplative Reptile'
         />
         <CardContent>
-          <div className={classes.price}>
+          <div className={classes.title}>
             <Typography variant='h4' component='h2'>
               {model}
             </Typography>
@@ -120,12 +120,14 @@ const Car = (props) => {
                   onClick={() => handleAdd_edit_car(true, id_auto)}>
                   <CreateIcon />
                 </IconButton>
-                <IconButton
-                  aria-label='delete'
-                  color='secondary'
-                  onClick={() => deleteCar(id_auto)}>
-                  <DeleteIcon />
-                </IconButton>
+                {!pozicane && (
+                  <IconButton
+                    aria-label='delete'
+                    color='secondary'
+                    onClick={() => deleteCar(id_auto)}>
+                    <DeleteIcon />
+                  </IconButton>
+                )}
               </>
             )}
 

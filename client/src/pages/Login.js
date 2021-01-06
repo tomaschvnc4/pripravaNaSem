@@ -67,13 +67,18 @@ const Login = () => {
               {resMsg}
             </Typography>
           )}
+          {resMsg && !isFaild && (
+            <Typography variant='subtitle1' component='h6' color='secondary'>
+              {resMsg}
+            </Typography>
+          )}
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className='between-center'>
               <Typography variant='h4' component='h4' color='primary'>
                 Prihlásenie
               </Typography>
               <Link to='/'>
-                <IconButton color='primary'>
+                <IconButton color='primary' onClick={() => handleResMsg('')}>
                   <ArrowBackIcon />
                 </IconButton>
               </Link>
@@ -123,7 +128,15 @@ const Login = () => {
               Prihlásiť sa
             </Button>
             <Typography variant='subtitle2' component='h5' className='center'>
-              Ešte nemáte účet, <Link to='/register'> zaregistrujte </Link> sa teraz.
+              Ešte nemáte účet,{' '}
+              <Link
+                to='/register'
+                onClick={() => {
+                  handleResMsg('');
+                }}>
+                zaregistrujte
+              </Link>
+              sa teraz.
             </Typography>
           </form>
         </Paper>

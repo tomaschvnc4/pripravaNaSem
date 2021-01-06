@@ -294,3 +294,13 @@ a {
 .width-100 {
   width: 100%;
 }
+
+/* 
+============
+Search
+============
+ */
+.search {
+  margin-top: 1rem;
+  padding-bottom: 0;
+}
