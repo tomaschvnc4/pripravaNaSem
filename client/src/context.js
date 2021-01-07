@@ -184,17 +184,17 @@ const AppProvider = ({ children }) => {
       fetchAuta();
    }, [isFetchData]);
 
-   useEffect(() => {
-      Axios.get('http://localhost:3001/login').then((response) => {
-         if (response.data.loggedIn) {
-            console.log(response);
-            const LoggedUser = response.data.user;
-            setIsAdmin(!!LoggedUser.isAdmin);
-            setIsLogin(true);
-            handleUser(LoggedUser);
-         }
-      });
-   }, []);
+   // useEffect(() => {
+   //    Axios.get('http://localhost:3001/login').then((response) => {
+   //       if (response.data.loggedIn) {
+   //          console.log(response);
+   //          const LoggedUser = response.data.user;
+   //          setIsAdmin(!!LoggedUser.isAdmin);
+   //          setIsLogin(true);
+   //          handleUser(LoggedUser);
+   //       }
+   //    });
+   // }, []);
 
    useEffect(() => {
       const results = stiahnuteData.filter((item) => item.model.toLowerCase().includes(searchTerm));

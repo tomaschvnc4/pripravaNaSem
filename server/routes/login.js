@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
+// const saltRounds = 10;
 
 const db = require('../database');
 
@@ -11,13 +11,13 @@ const validation = require('../Middlewares/validationMiddleware');
 const loginSchema = require('../Validations/loginValidation');
 
 /*===ROUTES=== */
-router.get('/', (req, res) => {
-   if (req.session.user) {
-      res.send({ loggedIn: true, user: req.session.user });
-   } else {
-      res.send({ loggedIn: false });
-   }
-});
+// router.get('/', (req, res) => {
+//    if (req.session.user) {
+//       res.send({ loggedIn: true, user: req.session.user });
+//    } else {
+//       res.send({ loggedIn: false });
+//    }
+// });
 
 router.post('/', (req, res) => {
    const { heslo, username } = req.body;
