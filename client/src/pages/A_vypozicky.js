@@ -19,30 +19,9 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { useGlobalContext } from '../context';
 import { green, red } from '@material-ui/core/colors';
 import { Redirect } from 'react-router-dom';
+import MyDialog from '../components/MyDialog';
 
-function createData(no, model, car_id, zakaznik, rezervacia, pozicane, vratene) {
-   return { no, model, car_id, zakaznik, rezervacia, pozicane, vratene };
-}
-let time = moment.now();
-time = moment(time).format('DD/MM/YYYY');
-const rows = [
-   createData(1, 'Fabia II', 14, 'Jakub Hrana', time, time, 'N'),
-   createData(2, 'Fabia II', 15, 'Jakub Hrana', time, 'A', 'N'),
-   createData(3, 'Fabia II', 9, 'Jakub Hrana', time, 'A', 'N'),
-   createData(4, 'Fabia II', 3, 'Jakub Hrana', time, 'N', 'A'),
-   createData(5, 'Fabia II', 19, 'Jakub Hrana', time, 'NA', 'N'),
-];
-
-const headerCol = [
-   'Model',
-   'ID_auto',
-   'Zákaznik',
-   'Rezervácia',
-   'Požičané',
-   'Vrátené',
-   // 'Pozn.',
-];
-// const headerCol = ['Model', 'ID_auto', 'Zákaznik', 'Požičané', 'Vrátené'];
+const headerCol = ['Model', 'ID_auto', 'Zákaznik', 'Rezervácia', 'Požičané', 'Vrátené'];
 
 const A_vypozicky = () => {
    const classes = useStyles();
@@ -54,7 +33,11 @@ const A_vypozicky = () => {
       zmazVypozicku,
       potvrdPozicanie,
       isAdmin,
+      isOpenDialogPotvrd,
+      handleDialogPotvrd,
    } = useGlobalContext();
+
+   const [idVypozicka, setIdVypozicka] = React.useState('');
 
    //tu vytvaram objekty do pola
    const vypozickyTabulka = dataVypozicky.map((vypozicka) => {
@@ -77,7 +60,7 @@ const A_vypozicky = () => {
       };
    });
 
-   console.log(vypozickyTabulka);
+   // console.log(vypozickyTabulka);
 
    //===RENDER===
    if (!isLogin) {
@@ -90,7 +73,15 @@ const A_vypozicky = () => {
 
    return (
       <div>
-         Vypozicky_admin
+         <MyDialog
+            title='Pozor:'
+            text='Určite chcete odstrániť túto rezerváciu?'
+            btnText='Potvrď'
+            btnFunction={zmazVypozicku}
+            open={isOpenDialogPotvrd}
+            handleDialog={handleDialogPotvrd}
+            id={idVypozicka}
+         />
          <ThemeProvider theme={themeGreenRed}>
             <Grid container justify='center'>
                <Grid item xs={12} sm={10}>
@@ -141,7 +132,11 @@ const A_vypozicky = () => {
                                                 <IconButton
                                                    color='secondary'
                                                    size='small'
-                                                   onClick={() => zmazVypozicku(row.id)}>
+                                                   //  onClick={() => zmazVypozicku(row.id)}>
+                                                   onClick={() => {
+                                                      setIdVypozicka(row.id);
+                                                      handleDialogPotvrd();
+                                                   }}>
                                                    <DeleteIcon />
                                                 </IconButton>
                                              </span>
@@ -153,7 +148,7 @@ const A_vypozicky = () => {
                                           {row.d_vratene}
                                           {row.d_vratene === '--/--/--' &&
                                              row.d_pozicane !== '--/--/--' &&
-                                             isAdmin(
+                                             isAdmin && (
                                                 <IconButton
                                                    color='primary'
                                                    size='small'

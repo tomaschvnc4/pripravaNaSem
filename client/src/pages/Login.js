@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import Axios from 'axios';
+import React from 'react';
 import { Link, Redirect } from 'react-router-dom';
 
 import { useForm } from 'react-hook-form';
@@ -15,45 +14,26 @@ import { useGlobalContext } from '../context';
 const Login = () => {
    const classes = useStyles();
    const {
-      handleLogin,
       isLogin,
       isFaild,
-      handleIsFailed,
       resMsg,
       handleResMsg,
-      handleUser,
       prihlasenie,
+      setisResgistraciaUspesna,
    } = useGlobalContext();
 
    const { register, handleSubmit, errors } = useForm();
    //my states
    const [isShowPass, setisShowPass] = React.useState(false);
-
    const onSubmit = (data, e) => {
       e.target.reset();
       prihlasenie(data);
-      // console.log(data);
-      //     const { username, heslo } = data;
-      // handleResMsg('');
-      //----/// Axios.defaults.withCredentials = true;
-      // Axios.post('http://localhost:3001/login', {
-      //   ...data,
-      // }).then((response) => {
-      //   const { stat, msg, newUser } = response.data;
-      //   console.log(newUser);
-      //   if (stat === true) {
-      //     console.log('logged');
-      //     handleIsFailed(false);
-      //     handleLogin(true);
-      //     handleResMsg('');
-      //     handleUser({ ...newUser });
-      //   } else {
-      //     console.log('failed');
-      //     handleIsFailed(true);
-      //     handleResMsg(msg);
-      //   }
-      // });
    };
+
+   React.useEffect(() => {
+      setisResgistraciaUspesna(false);
+   });
+
    if (isLogin) {
       return <Redirect to={{ pathname: '/' }} />;
    }
@@ -93,13 +73,12 @@ const Login = () => {
                      name='username'
                      type='text'
                      id='username'
-                     error={errors.hasOwnProperty('username')} //ak ju errory v poli atribut fullname tak znamena ze je error a nastavi na true
+                     error={errors.hasOwnProperty('username')}
                      helperText={errors.username?.message}
-                     // onChange={(e) => setFullName(e.target.value)}
                      inputRef={register({
                         pattern: {
-                           //   value: /^(\+?\d{0,4})?\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{4}\)?)?$/,
-                           //   message: 'Meno vyzaduje len znaky ',
+                           value: /^[a-zA-Z0-9_-]*$/,
+                           message: 'Meno vyzaduje len znaky ',
                         },
                         required: 'Meno je potrebne vyplnit ',
                      })}

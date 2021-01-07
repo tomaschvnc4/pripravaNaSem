@@ -12,7 +12,7 @@ const validation = require('../Middlewares/validationMiddleware');
 const registerSchema = require('../Validations/registerValidation');
 
 /*===ROUTES=== */
-router.post('/', (req, res) => {
+router.post('/', validation(registerSchema), (req, res) => {
    const { meno, heslo, email, telefon, username } = req.body;
    // console.log(req.body);
    let sql = 'SELECT * FROM user WHERE email=? OR username=?';

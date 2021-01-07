@@ -6,155 +6,155 @@ const db = require('../database');
 const carImagePath = './Public/Images/';
 // const fileFath = './Public/Images/01fabia_small.png';
 const deleteImage = (fileFath) => {
-  console.log('DELETE OBR TU');
-  console.log(fileFath);
-  fs.stat(fileFath, function (err, stats) {
-    console.log(stats); //here we got all information of file in stats variable
+   console.log('DELETE OBR TU');
+   console.log(fileFath);
+   fs.stat(fileFath, function (err, stats) {
+      console.log(stats); //here we got all information of file in stats variable
 
-    if (err) {
-      return console.error(err);
-    }
+      if (err) {
+         return console.error(err);
+      }
 
-    fs.unlink(fileFath, function (err) {
-      if (err) return console.log(err);
-      console.log('file deleted successfully');
-    });
-  });
+      fs.unlink(fileFath, function (err) {
+         if (err) return console.log(err);
+         console.log('file deleted successfully');
+      });
+   });
 };
 
 router.post('/add', (req, res) => {
-  const { znacka, model, farba, spz, palivo, vykon, spotreba, cena, znamka, popis } = req.body;
-  let msg = '';
-  let stat = false;
-  // console.log(req.body);
-  // console.log(req.files);
+   const { znacka, model, farba, spz, palivo, vykon, spotreba, cena, znamka, popis } = req.body;
+   let msg = '';
+   let stat = false;
+   // console.log(req.body);
+   // console.log(req.files);
 
-  let sql;
-  sql =
-    'INSERT INTO auta (znacka, model, farba, spz, palivo, vykon, spotreba,cena,znamka,popis) VALUES (?,?,?,?,?,?,?,?,?,?)';
-  db.query(
-    sql,
-    [znacka, model, farba, spz, palivo, vykon, spotreba, cena, znamka, popis],
-    (err, result) => {
-      if (err) {
-        console.log(err);
-        console.log(err.errno);
-        if (err.errno === 1062) {
-          msg = 'Auto s takouto SPZ už exituje';
-        }
-      } else {
-        msg = 'Auto pridané úspešne!';
-        stat = true;
+   let sql;
+   sql =
+      'INSERT INTO auta (znacka, model, farba, spz, palivo, vykon, spotreba,cena,znamka,popis) VALUES (?,?,?,?,?,?,?,?,?,?)';
+   db.query(
+      sql,
+      [znacka, model, farba, spz, palivo, vykon, spotreba, cena, znamka, popis],
+      (err, result) => {
+         if (err) {
+            console.log(err);
+            console.log(err.errno);
+            if (err.errno === 1062) {
+               msg = 'Auto s takouto SPZ už exituje';
+            }
+         } else {
+            msg = 'Auto pridané úspešne!';
+            stat = true;
+         }
+         res.send({ msg, stat });
       }
-      res.send({ msg, stat });
-    }
-  );
+   );
 });
 
 router.get('/getAuta', async (req, res) => {
-  const sql = 'SELECT * FROM auta';
-  db.query(sql, (err, result) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.send(result);
-    }
-  });
+   const sql = 'SELECT * FROM auta';
+   db.query(sql, (err, result) => {
+      if (err) {
+         console.log(err);
+      } else {
+         res.send(result);
+      }
+   });
 
-  //====cez async await
-  // const data = await db.query(sql);
-  // console.log(data[0]);
-  // res.send(data[0]);
+   //====cez async await
+   // const data = await db.query(sql);
+   // console.log(data[0]);
+   // res.send(data[0]);
 });
 
 //!!! toto ide random potrebone await async
 router.delete('/delete/:id', (req, res) => {
-  console.log('DELETE AUTO');
-  const id = req.params.id;
-  console.log(id);
-  let path = '';
-  let sql = 'SELECT image FROM auta WHERE id = ?';
-  console.log(sql);
-  db.query(sql, id, (err, result) => {
-    if (err) console.log(err);
-    const dlzka = result.length;
-    if (dlzka > 0) {
-      console.log(result);
-      path = result[0].image;
-      // console.log(path);
-
-      deleteImage(path);
-    }
-
-    sql = 'DELETE FROM auta WHERE id = ?';
-    console.log(sql);
-    db.query(sql, id, (err, result) => {
+   console.log('DELETE AUTO');
+   const id = req.params.id;
+   console.log(id);
+   let path = '';
+   let sql = 'SELECT image FROM auta WHERE id = ?';
+   console.log(sql);
+   db.query(sql, id, (err, result) => {
       if (err) console.log(err);
-      res.send(`Úspešne zmazané auto s id: ${id}`);
-    });
-  });
+      const dlzka = result.length;
+      if (dlzka > 0) {
+         console.log(result);
+         path = result[0].image;
+         // console.log(path);
+
+         deleteImage(path);
+      }
+
+      sql = 'DELETE FROM auta WHERE id = ?';
+      console.log(sql);
+      db.query(sql, id, (err, result) => {
+         if (err) console.log(err);
+         res.send(`Úspešne zmazané auto s id: ${id}`);
+      });
+   });
 });
 
 router.put('/update', (req, res) => {
-  const { znacka, model, farba, spz, palivo, vykon, spotreba, cena, znamka, id } = req.body;
-  // console.log(req.body);
-  let msg = '';
-  let stat = false;
-  let sql =
-    'UPDATE auta SET znacka = ?, model = ?, farba = ?, spz = ?, palivo = ?, vykon = ?, spotreba = ?, cena = ?, znamka = ? WHERE id = ?';
-  db.query(
-    sql,
-    [znacka, model, farba, spz, palivo, vykon, spotreba, cena, znamka, id],
-    (err, result) => {
-      if (err) {
-        console.log(err);
-      } else {
-        stat = true;
-        msg = 'uprava úspešná';
-        console.log('TU');
-        console.log(result);
+   const { znacka, model, farba, spz, palivo, vykon, spotreba, cena, znamka, id, popis } = req.body;
+   // console.log(req.body);
+   let msg = '';
+   let stat = false;
+   let sql =
+      'UPDATE auta SET znacka = ?, model = ?, farba = ?, spz = ?, palivo = ?, vykon = ?, spotreba = ?, cena = ?, znamka = ?, popis = ? WHERE id = ?';
+   db.query(
+      sql,
+      [znacka, model, farba, spz, palivo, vykon, spotreba, cena, znamka, popis, id],
+      (err, result) => {
+         if (err) {
+            console.log(err);
+         } else {
+            stat = true;
+            msg = 'uprava úspešná';
+            console.log('TU');
+            console.log(result);
+         }
+         res.send({ stat, msg });
       }
-      res.send({ stat, msg });
-    }
-  );
+   );
 });
 
 //======IMG=============
 
 router.put('/update/picture/:spz?/:path?', (req, res) => {
-  let { path, spz } = req.params;
-  console.log(req.params);
-  console.log(path);
-  console.log(spz);
-  try {
-    if (!req.files) {
-      res.send({
-        stat: false,
-        msg: 'No files',
-      });
-    } else {
-      const { picture } = req.files;
-      console.log(picture);
-      console.log(picture.name);
-      const fullPath = carImagePath + spz + '_' + picture.name;
-      picture.mv(`${fullPath}`);
+   let { path, spz } = req.params;
+   console.log(req.params);
+   console.log(path);
+   console.log(spz);
+   try {
+      if (!req.files) {
+         res.send({
+            stat: false,
+            msg: 'No files',
+         });
+      } else {
+         const { picture } = req.files;
+         console.log(picture);
+         console.log(picture.mimetype);
+         const fullPath = carImagePath + spz + '_' + picture.name;
+         picture.mv(`${fullPath}`);
 
-      const sql = 'UPDATE auta SET image = ? WHERE spz = ?';
-      db.query(sql, [fullPath, spz], (err, res) => {
-        err && console.log(err);
-      });
+         const sql = 'UPDATE auta SET image = ? WHERE spz = ?';
+         db.query(sql, [fullPath, spz], (err, res) => {
+            err && console.log(err);
+         });
 
-      res.send({
-        stat: true,
-        msg: 'File is uploaded',
-      });
-      path = carImagePath + path;
-      deleteImage(path);
-      res.send({ stat, msg });
-    }
-  } catch (e) {
-    res.status(500).send(e);
-  }
+         res.send({
+            stat: true,
+            msg: 'File is uploaded',
+         });
+         path = carImagePath + path;
+         deleteImage(path);
+         res.send({ stat, msg });
+      }
+   } catch (e) {
+      res.status(500).send(e);
+   }
 });
 
 // app.post('/picture/:spz', (req, res) => {

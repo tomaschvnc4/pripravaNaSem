@@ -1,15 +1,11 @@
-const validation = (schema) => (reqq, ress, next) => {
-   const body = reqq.body;
-   console.log('VAL1');
-   console.log(reqq.body);
+const validation = (schema) => async (req, res, next) => {
+   const body = req.body;
+   console.log(req.body);
    try {
-      schema.validate(body);
-      console.log('VAL2');
+      await schema.validate(body);
       next();
-      return next();
    } catch (error) {
-      console.log('VAL3');
-      return ress.status(400).json({ error });
+      res.status(403).json({ error });
    }
 };
 

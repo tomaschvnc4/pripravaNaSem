@@ -1,9 +1,6 @@
-import Axios from 'axios';
 import React, { useState, useContext, useEffect } from 'react';
+import Axios from 'axios';
 import moment from 'moment';
-
-import dataFile from './cars_data';
-import { Redirect } from 'react-router-dom';
 
 const AppContext = React.createContext();
 
@@ -30,7 +27,9 @@ const AppProvider = ({ children }) => {
    const [isLoading, setIsLoading] = useState(true);
    const [isLogin, setIsLogin] = useState(false);
    const [isFaild, setIsFaild] = useState(false);
-   //const [isOpenDialogCar, setOpenDialogCar] = useState(false);
+   const [isResgistraciaUspesna, setisResgistraciaUspesna] = useState(false);
+   // const [isOpenDialogCar, setOpenDialogCar] = useState(false);
+   const [isOpenDialogPotvrd, setOpenDialogPotvrd] = useState(false);
    const [isOpenDialogLogOut, setOpenDialogLogOut] = useState(false);
    const [isAdmin, setIsAdmin] = useState(false);
    const [isFetchData, setIsFetchData] = useState(true);
@@ -51,13 +50,13 @@ const AppProvider = ({ children }) => {
    const handleIsFailed = (val) => setIsFaild(val);
    //const handleDialogCar = () => setOpenDialogCar(!isOpenDialogCar);
    const handleDialogLogOut = () => setOpenDialogLogOut(!isOpenDialogLogOut);
+   const handleDialogPotvrd = () => setOpenDialogPotvrd(!isOpenDialogPotvrd);
    const handleIsFetchData = () => setIsFetchData(!isFetchData);
 
    const handleResMsg = (val) => setResMsg(val);
    const handleAdd_edit_car = (open = false, id = '') => {
       if (id && id !== 'new') {
          const autoNaUpravutmp = dataCars.find((item) => item.id == id);
-         // autoNaUpravutmp && setautoNaUpravu(autoNaUpravutmp);
          setautoNaUpravu(autoNaUpravutmp);
       }
       setAdd_edit_car({ open, id });
@@ -121,10 +120,28 @@ const AppProvider = ({ children }) => {
          setIsLogin(true);
          resMsg || setResMsg(''); //ak resMsg je daka sprava tak vynuluj
          handleUser({ ...newUser });
+         if (newUser.isAdmin) {
+            setIsAdmin(!!newUser.isAdmin);
+         }
       } else {
          console.log('failed');
          setIsFaild(true);
          setResMsg(msg);
+      }
+   };
+
+   const registracia = async (data) => {
+      handleResMsg('');
+      console.log(data);
+
+      const response = await Axios.post('http://localhost:3001/register', {
+         ...data,
+      });
+      console.log(response);
+      handleResMsg(response.data.msg);
+
+      if (response.data.stat) {
+         setisResgistraciaUspesna(true);
       }
    };
 
@@ -134,7 +151,6 @@ const AppProvider = ({ children }) => {
       console.log(responseAuta);
       const responsePozicaneAutaId = await Axios.get('http://localhost:3001/vypozicka/pozicaneID');
       const idPozicaneArray = responsePozicaneAutaId.data.result;
-      // stiahnuteData = [...responseAuta.data]; //urobim kopiu nie referenciu --'vysyspem'vsetko z data do stiahnute
       stiahnuteData = responseAuta.data.map((auto) => {
          //ak mi vrati objekt auto je pozicane ulozim si TRUE ak nie je pozicane vrati undefined a tak vratim FALSE
          let pozicane = idPozicaneArray.find((objResult) => auto.id === objResult.id_auto)
@@ -154,7 +170,7 @@ const AppProvider = ({ children }) => {
       const response = await Axios.get(`http://localhost:3001/vypozicka/get/${isAdmin}/${id}`);
       console.log(response.data);
       let { result } = response.data;
-      const tmp = { ...result };
+      // const tmp = { ...result };
       result.sort((a, b) => b.id - a.id);
       setDataVypozicky(result);
       console.log('fetch');
@@ -180,6 +196,11 @@ const AppProvider = ({ children }) => {
       fetchAuta();
    };
 
+   const deleteCar = async (id_auto) => {
+      const response = await Axios.delete(`http://localhost:3001/auta/delete/${id_auto}`);
+      handleIsFetchData();
+   };
+
    useEffect(() => {
       fetchAuta();
    }, [isFetchData]);
@@ -200,10 +221,6 @@ const AppProvider = ({ children }) => {
       const results = stiahnuteData.filter((item) => item.model.toLowerCase().includes(searchTerm));
       results && setDataCars(results);
    }, [searchTerm]);
-
-   // useEffect(() => {
-   //   setAdd_edit_car(defaultValues.add_edit_car);
-   // }, [add_edit_car]);
 
    //   ==RETURN===
    return (
@@ -243,6 +260,12 @@ const AppProvider = ({ children }) => {
             odhlasenie,
             prihlasenie,
             setSearchTerm,
+            isOpenDialogPotvrd,
+            handleDialogPotvrd,
+            deleteCar,
+            isResgistraciaUspesna,
+            setisResgistraciaUspesna,
+            registracia,
          }}>
          {children}
       </AppContext.Provider>

@@ -62,8 +62,8 @@ app.use('/login', loginRouter);
 app.use('/vypozicka', vypozickaRouter);
 app.use('/auta', autaRouter);
 
-const validation = require('./Middlewares/validationMiddleware');
-const registerSchema = require('./Validations/registerValidation');
+// const validation = require('./Middlewares/validationMiddleware');
+// const registerSchema = require('./Validations/registerValidation');
 
 /**
 ================
@@ -96,7 +96,7 @@ const basicSelect = async (table = '', whatIWant = '', whereKey = '', paramWhere
    }
 };
 
-app.post('/test', validation(registerSchema), (req, res) => {
+app.post('/test', (req, res) => {
    // const tmp = await basicSelect('autaa', 'image', 'id', 37);
    // console.log('tu');
    // res.send(tmp);
